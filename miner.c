@@ -1,5 +1,6 @@
 //VF CASH - Standalone Miner - August 2019
 //James William Fletcher
+//Claim addresses at 23:00 UTC
 
 #include <stdio.h>
 #include <math.h>
@@ -60,7 +61,7 @@ double getMiningDifficulty()
 {
     const time_t lt = time(0);
     const struct tm* tmi = gmtime(&lt);
-    double rv = (double)tmi->tm_hour * 0.01;
+    double rv = (double)(tmi->tm_hour+1) * 0.01;
     if(rv == 0)
         rv = 0.005;
     return rv; 
@@ -100,7 +101,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
     const double a3 = gNa(&v[2], &v[1]);
     const double a4 = gNa(&v[1], &v[4]);
 
-    const double min = getMiningDifficulty();
+    const double min = 0.24;
     
     if(a1 < min && a2 < min && a3 < min && a4 < min)
     {
@@ -138,7 +139,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
 
 int main()
 {
-    printf("Please wait, minted keys are saved to minted.txt ...\n");
+    printf("Please wait, minted keys are saved to minted.txt, difficulty now %.2f ...\n", getMiningDifficulty());
     time_t nt = time(0)+16;
     uint64_t c = 0;
     while(1)
