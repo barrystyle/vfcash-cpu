@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <locale.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
@@ -117,8 +116,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
         size_t len = 256;
         b58enc(bpriv, &len, a, ECC_BYTES+1);
         
-        setlocale(LC_NUMERIC, "");
-        printf("subG: %.8f - %.8f - %.8f - %.8f - %'.3f VFC < %.3f\n\nPrivate Key: %s\n\n", a1, a2, a3, a4, toDB(rv), ra, bpriv);
+        printf("subG: %.8f - %.8f - %.8f - %.8f - %.3f VFC < %.3f\n\nPrivate Key: %s\n\n", a1, a2, a3, a4, toDB(rv), ra, bpriv);
         
         FILE* f = fopen("minted.txt", "a");
         if(f != NULL)
@@ -148,11 +146,9 @@ int main()
         if(time(0) > nt)
         {
             if(c > 0)
-            {
-                setlocale(LC_NUMERIC, "");
-                printf("HASH/s: %'lu\n", c/16);
-            }
+                printf("HASH/s: %lu\n", c/16);
             
+            c = 0;
             nt = time(0)+16;
         }
         
