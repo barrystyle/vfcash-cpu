@@ -6,6 +6,7 @@
 #include <locale.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "ecc.h"
 #include "base58.h"
