@@ -1433,10 +1433,7 @@ double getMiningDifficulty()
 {
     const time_t lt = time(0);
     const struct tm* tmi = gmtime(&lt);
-    double rv = (double)tmi->tm_hour * 0.01;
-    if(rv == 0)
-        rv = 0.005;
-    return rv; 
+    return (double)(tmi->tm_hour+1) * 0.01; 
 }
 
 uint64_t isSubGenesisAddress(uint8_t *a)
@@ -1473,7 +1470,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
     const double a3 = gNa(&v[2], &v[1]);
     const double a4 = gNa(&v[1], &v[4]);
 
-    const double min = getMiningDifficulty();
+    const double min = 0.24;
     
     if(a1 < min && a2 < min && a3 < min && a4 < min)
     {
