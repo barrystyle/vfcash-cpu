@@ -15,7 +15,7 @@ double toDB(const uint64_t b)
     return (double)(b) / 1000;
 }
 
-double floor(double i)
+double mfloor(double i)
 {
     if(i < 0)
         return (int)i - 1;
@@ -94,7 +94,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
             return 0;
         const double ra = at/4;
         const double mn = 4.166666667;
-        const uint64_t rv = (uint64_t)floor(( 1000 + ( 10000*(1-(ra*mn)) ) )+0.5);
+        const uint64_t rv = (uint64_t)mfloor(( 1000 + ( 10000*(1-(ra*mn)) ) )+0.5);
 
         char bpriv[256];
         memset(bpriv, 0, sizeof(bpriv));
