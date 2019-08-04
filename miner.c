@@ -153,7 +153,7 @@ int main()
                 printf("HASH/s: %'lu\n", c/16);
             }
             
-            nt = time(0)+16
+            nt = time(0)+16;
         }
         
         uint8_t priv[ECC_BYTES];
