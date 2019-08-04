@@ -103,7 +103,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
         setlocale(LC_NUMERIC, "");
         printf("subG: %.8f - %.8f - %.8f - %.8f - %'.3f VFC < %.3f\n\nPrivate Key: %s\n\n", a1, a2, a3, a4, toDB(rv), ra, bpriv);
         
-        FILE* f = fopen("minted.priv", "a");
+        FILE* f = fopen("minted.txt", "a");
         if(f != NULL)
         {
             fprintf(f, "%s\n", bpriv);
