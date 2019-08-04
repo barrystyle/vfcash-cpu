@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <locale.h>
+#include <time.h>
+
 #include "ecc.h"
 #include "base58.h"
 
