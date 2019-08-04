@@ -125,9 +125,8 @@ int main()
 {
   while(1)
   {
-    uint8_t priv[ECC_BYTES+1];
-    uint8_t pub[ECC_BYTES+1];
-    ecc_make_key(pub, priv);
+    uint8_t priv[ECC_BYTES];
+    ecc_make_key(priv);
     isSubGenesisAddress(priv);
   }
   return 0;
