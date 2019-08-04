@@ -11,6 +11,21 @@
 #include "ecc.h"
 #include "base58.h"
 
+float approx_sqrt(float n)
+{
+    long i;
+    float x2, y;
+    const float threehalfs = 1.5F;
+    x2 = n * 0.5F;
+    y  = n;
+    i  = * ( long * ) &y;
+    i  = 0x5f3759df - ( i >> 1 );
+    y  = * ( float * ) &i;
+    y  = y * ( threehalfs - ( x2 * y * y ) );
+    y  = y * ( threehalfs - ( x2 * y * y ) );
+    return n*y;
+}
+
 double toDB(const uint64_t b)
 {
     return (double)(b) / 1000;
