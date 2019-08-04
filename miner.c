@@ -26,7 +26,6 @@ struct vec3
 };
 typedef struct vec3 vec3;
 
-//Get normal angle
 inline static double gNa(const vec3* a, const vec3* b)
 {
     const double dot = ((double)(a->x) * (double)(b->x)) + ((double)(a->y) * (double)(b->y)) + (double)((a->z) * (double)(b->z)); //dot product of both vectors
@@ -100,8 +99,15 @@ uint64_t isSubGenesisAddress(uint8_t *a)
         b58enc(bpriv, &len, a, ECC_BYTES+1);
         
         setlocale(LC_NUMERIC, "");
-        printf("subG: %.8f - %.8f - %.8f - %.8f - %'.3f VFC < %.3f\n\n%s\n\n", a1, a2, a3, a4, toDB(rv), ra, bpriv);
-
+        printf("subG: %.8f - %.8f - %.8f - %.8f - %'.3f VFC < %.3f\n\nPrivate Key: %s\n\n", a1, a2, a3, a4, toDB(rv), ra, bpriv);
+        
+        FILE* f = fopen("minted.priv", "a");
+        if(f != NULL)
+        {
+            fprintf(f, "%s\n", bpriv);
+            fclose(f);
+        }
+        
         return rv;
     }
     
