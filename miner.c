@@ -140,11 +140,26 @@ uint64_t isSubGenesisAddress(uint8_t *a)
 
 int main()
 {
-  while(1)
-  {
-    uint8_t priv[ECC_BYTES];
-    ecc_make_key(priv);
-    isSubGenesisAddress(priv);
-  }
-  return 0;
+    printf("Please wait, minted keys are saved to minted.txt ...\n");
+    time_t nt = time(0)+16;
+    uint64_t c = 0;
+    while(1)
+    {
+        if(time(0) > nt)
+        {
+            if(c > 0)
+            {
+                setlocale(LC_NUMERIC, "");
+                printf("HASH/s: %'lu\n", c/16);
+            }
+            
+            nt = time(0)+16
+        }
+        
+        uint8_t priv[ECC_BYTES];
+        ecc_make_key(priv);
+        isSubGenesisAddress(priv);
+        c++;
+    }
+    return 0;
 }
