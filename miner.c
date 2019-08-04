@@ -5,16 +5,17 @@
 #include <math.h>
 #include <locale.h>
 #include <time.h>
+#include <string.h>
 
 #include "ecc.h"
 #include "base58.h"
 
-inline static double toDB(const uint64_t b)
+double toDB(const uint64_t b)
 {
     return (double)(b) / 1000;
 }
 
-inline static double floor(double i)
+double floor(double i)
 {
     if(i < 0)
         return (int)i - 1;
@@ -28,7 +29,7 @@ struct vec3
 };
 typedef struct vec3 vec3;
 
-inline static double gNa(const vec3* a, const vec3* b)
+double gNa(const vec3* a, const vec3* b)
 {
     const double dot = ((double)(a->x) * (double)(b->x)) + ((double)(a->y) * (double)(b->y)) + (double)((a->z) * (double)(b->z)); //dot product of both vectors
     const double m1 = sqrt((double)((a->x) * (double)(a->x)) + (double)((a->y) * (double)(a->y)) + (double)((a->z) * (double)(a->z))); //magnitude
@@ -40,7 +41,7 @@ inline static double gNa(const vec3* a, const vec3* b)
     return dot / (m1*m2);
 }
 
-inline static double getMiningDifficulty()
+double getMiningDifficulty()
 {
     const time_t lt = time(0);
     const struct tm* tmi = gmtime(&lt);
@@ -88,10 +89,10 @@ uint64_t isSubGenesisAddress(uint8_t *a)
     
     if(a1 < min && a2 < min && a3 < min && a4 < min)
     {
-        const double a = (a1+a2+a3+a4);
-        if(a <= 0)
+        const double at = (a1+a2+a3+a4);
+        if(at <= 0)
             return 0;
-        const double ra = a/4;
+        const double ra = at/4;
         const double mn = 4.166666667;
         const uint64_t rv = (uint64_t)floor(( 1000 + ( 10000*(1-(ra*mn)) ) )+0.5);
 
