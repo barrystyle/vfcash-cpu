@@ -138,13 +138,16 @@ uint64_t isSubGenesisAddress(uint8_t *a)
 int main()
 {
     printf("Please wait, minted keys are saved to minted.txt, difficulty 0.24 ...\n");
-    printf("Number of threads: %d\n", omp_get_num_threads());
     
-    int nthreads, tid;
-    #pragma omp parallel private(nthreads, tid)
+    #pragma omp parallel
     {
+        int tid = omp_get_thread_num();
+        int nthreads;
         if(tid == 0)
+        {
             nthreads = omp_get_num_threads();
+            printf("Number of threads: %d\n", omp_get_num_threads());
+        }
         
         time_t nt = time(0)+16;
         uint64_t c = 0;
