@@ -147,10 +147,10 @@ int main()
             if(time(0) > nt)
             {
                 if(tid == 0)
-                    printf("~HASH/s: %lu\n", (c*nthreads)/16);
+                    printf("HASH/s: %lu\n", (c*nthreads)/16);
 
                 if(c > 0)
-                    printf("T-%i: HASH/s: %lu\n", omp_get_thread_num(), c/16);
+                    printf("T-%i: %lu\n", omp_get_thread_num(), c/16);
 
                 c = 0;
                 nt = time(0)+16;
