@@ -1,6 +1,5 @@
 //VF CASH - Standalone Miner - August 2019
 //James William Fletcher
-//Claim addresses at 23:00 UTC
 
 #include <omp.h>
 #include <stdio.h>
