@@ -165,7 +165,7 @@ int main()
                 char bpriv[256];
                 memset(bpriv, 0, sizeof(bpriv));
                 size_t len = 256;
-                b58enc(bpriv, &len, priv, ECC_BYTES+1);
+                b58enc(bpriv, &len, priv, ECC_BYTES);
 
                 const double fr = toDB(r);
                 printf("Private Key: %s (%.3f)\n\n", bpriv, fr);
