@@ -139,8 +139,11 @@ int main()
 {
     printf("Please wait, minted keys are saved to minted.txt, difficulty 0.24 ...\n");
     
-    #pragma omp parallel
+    //#pragma omp parallel
+    #pragma omp target teams distribute parallel for
+    for(int i=0; i < 3; ++i) 
     {
+        i=0;
         int tid = omp_get_thread_num();
         int nthreads;
         if(tid == 0)
@@ -156,7 +159,7 @@ int main()
             if(time(0) > nt)
             {
                 if(tid == 0)
-                    printf("HASH/s: %lu\n", (c*nthreads)/16);
+                    printf("~HASH/s: %lu\n", (c*nthreads)/16);
 
                 if(c > 0)
                     printf("T-%i: HASH/s: %lu\n", omp_get_thread_num(), c/16);
