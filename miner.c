@@ -1,5 +1,6 @@
 //VF CASH - Standalone Miner - August 2019
 //James William Fletcher
+//Claim addresses at 23:00 UTC
 
 #include <omp.h>
 #include <stdio.h>
@@ -166,12 +167,13 @@ int main()
                 size_t len = 256;
                 b58enc(bpriv, &len, priv, ECC_BYTES+1);
 
-                printf("Private Key: %s\n\n", bpriv);
+                const double fr = toDB(r);
+                printf("Private Key: %s (%.3f)\n\n", bpriv, fr);
                 
                 FILE* f = fopen("minted.txt", "a");
                 if(f != NULL)
                 {
-                    fprintf(f, "%s / %.3f\n", bpriv, toDB(r));
+                    fprintf(f, "%s / %.3f\n", bpriv, fr);
                     fclose(f);
                 }
             }
