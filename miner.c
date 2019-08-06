@@ -158,7 +158,7 @@ int main()
             uint8_t priv[ECC_BYTES];
             ecc_make_key(priv);
             isSubGenesisAddress(priv);
-            if(tid == 0) 
+            if(tid == 0)
                 nthreads = omp_get_num_threads();
         }
         
