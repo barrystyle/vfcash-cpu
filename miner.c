@@ -139,30 +139,33 @@ int main()
 {
     printf("Please wait, minted keys are saved to minted.txt, difficulty 0.24 ...\n");
     printf("Number of threads: %d\n", omp_get_num_threads());
-    time_t nt = time(0)+16;
-    uint64_t c = 0;
-    while(1)
+    
+    int nthreads, tid;
+    #pragma omp parallel private(nthreads, tid)
     {
-        if(time(0) > nt)
+        if(tid == 0)
+            nthreads = omp_get_num_threads();
+        
+        time_t nt = time(0)+16;
+        uint64_t c = 0;
+        while(1)
         {
-            if(c > 0)
-                printf("HASH/s: %lu\n", c/16);
-            
-            c = 0;
-            nt = time(0)+16;
-        }
-       
-        int nthreads, tid;
-        #pragma omp parallel private(nthreads, tid)
-        {
+            if(time(0) > nt)
+            {
+                if(c > 0)
+                    printf("T-%i: HASH/s: %lu\n", omp_get_thread_num(), c/16);
+
+                c = 0;
+                nt = time(0)+16;
+            }
+
             uint8_t priv[ECC_BYTES];
             ecc_make_key(priv);
             isSubGenesisAddress(priv);
-            if(tid == 0)
-                nthreads = omp_get_num_threads();
+
+            c++;
         }
-        
-        c++;
     }
+    
     return 0;
 }
