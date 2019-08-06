@@ -155,6 +155,9 @@ int main()
         {
             if(time(0) > nt)
             {
+                if(tid == 0)
+                    printf("HASH/s: %lu\n", (c*nthreads)/16);
+
                 if(c > 0)
                     printf("T-%i: HASH/s: %lu\n", omp_get_thread_num(), c/16);
 
