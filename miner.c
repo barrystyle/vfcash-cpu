@@ -109,20 +109,8 @@ uint64_t isSubGenesisAddress(uint8_t *a)
         const double ra = at/4;
         const double mn = 4.166666667;
         const uint64_t rv = (uint64_t)mfloor(( 1000 + ( 10000*(1-(ra*mn)) ) )+0.5);
-
-        char bpriv[256];
-        memset(bpriv, 0, sizeof(bpriv));
-        size_t len = 256;
-        b58enc(bpriv, &len, a, ECC_BYTES+1);
         
-        printf("subG: %.8f - %.8f - %.8f - %.8f - %.3f VFC < %.3f\n\nPrivate Key: %s\n\n", a1, a2, a3, a4, toDB(rv), ra, bpriv);
-        
-        FILE* f = fopen("minted.txt", "a");
-        if(f != NULL)
-        {
-            fprintf(f, "%s\n", bpriv);
-            fclose(f);
-        }
+        printf("subG: %.8f - %.8f - %.8f - %.8f - %.3f VFC < %.3f\n\n", a1, a2, a3, a4, toDB(rv), ra);
         
         return rv;
     }
@@ -171,7 +159,22 @@ int main()
             uint8_t priv[ECC_BYTES];
             uint8_t pub[ECC_BYTES+1];
             ecc_make_key(pub, priv);
-            isSubGenesisAddress(pub);
+            if(isSubGenesisAddress(pub) != 0)
+            {
+                char bpriv[256];
+                memset(bpriv, 0, sizeof(bpriv));
+                size_t len = 256;
+                b58enc(bpriv, &len, priv, ECC_BYTES+1);
+
+                printf("Private Key: %s\n\n", bpriv);
+                
+                FILE* f = fopen("minted.txt", "a");
+                if(f != NULL)
+                {
+                    fprintf(f, "%s\n", bpriv);
+                    fclose(f);
+                }
+            }
 
             c++;
         }
