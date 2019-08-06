@@ -2,6 +2,7 @@
 //James William Fletcher
 //Claim addresses at 23:00 UTC
 
+#include <omp.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
@@ -136,7 +137,8 @@ uint64_t isSubGenesisAddress(uint8_t *a)
 
 int main()
 {
-    printf("Please wait, minted keys are saved to minted.txt, difficulty now %.2f ...\n", getMiningDifficulty());
+    printf("Please wait, minted keys are saved to minted.txt, difficulty 0.24 ...\n");
+    printf("Number of threads: %d\n", omp_get_num_threads());
     time_t nt = time(0)+16;
     uint64_t c = 0;
     while(1)
@@ -149,10 +151,17 @@ int main()
             c = 0;
             nt = time(0)+16;
         }
+       
+        int nthreads, tid;
+        #pragma omp parallel private(nthreads, tid)
+        {
+            uint8_t priv[ECC_BYTES];
+            ecc_make_key(priv);
+            isSubGenesisAddress(priv);
+            if(tid == 0) 
+                nthreads = omp_get_num_threads();
+        }
         
-        uint8_t priv[ECC_BYTES];
-        ecc_make_key(priv);
-        isSubGenesisAddress(priv);
         c++;
     }
     return 0;
