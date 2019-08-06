@@ -159,7 +159,8 @@ int main()
             uint8_t priv[ECC_BYTES];
             uint8_t pub[ECC_BYTES+1];
             ecc_make_key(pub, priv);
-            if(isSubGenesisAddress(pub) != 0)
+            uint64_t r = isSubGenesisAddress(pub);
+            if(r != 0)
             {
                 char bpriv[256];
                 memset(bpriv, 0, sizeof(bpriv));
@@ -171,7 +172,7 @@ int main()
                 FILE* f = fopen("minted.txt", "a");
                 if(f != NULL)
                 {
-                    fprintf(f, "%s\n", bpriv);
+                    fprintf(f, "%s / %.3f\n", bpriv, toDB(r));
                     fclose(f);
                 }
             }
