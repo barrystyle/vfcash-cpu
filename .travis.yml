@@ -16,9 +16,8 @@ os:
   - linux
 deploy:
   provider: releases
+  api_key: "b1ea91fb09fad3cad7b7bc6cf799eadfa0767904"
   skip_cleanup: true
-  api_key:
-    secure: somekey
   file:
   - miner.windows.amd64.exe
   - miner.osx.amd64
