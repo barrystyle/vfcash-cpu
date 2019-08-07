@@ -10,3 +10,20 @@ addons:
       - gcc-8
       - cmake
 script: make
+os:
+  - windows
+  - osx
+  - linux
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: somekey
+  file:
+  - miner.windows.amd64.exe
+  - miner.osx.amd64
+  - miner.linux.amd64
+  on:
+    repo: vfcash/RELEASES
+    tags: true
+    condition: $LATEST = true
