@@ -1,1 +1,11 @@
+dist: trusty
+sudo: require
 compiler: gcc
+language: c
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-8
+      - cmake
