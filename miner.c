@@ -68,7 +68,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
 {
     vec3 v[5];
 
-    char *ofs = a;
+    uint8_t *ofs = a;
     memcpy(&v[0].x, ofs, sizeof(uint16_t));
     memcpy(&v[0].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
     memcpy(&v[0].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
