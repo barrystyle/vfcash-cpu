@@ -45,7 +45,7 @@ def main():
 
 	print("Executing transactions to Public Key: " + publicKey)
 
-	fileName = "minted.priv"
+	fileName = "minted.txt"
 	restAPIUrl = "somesite.com"
 
 	# failedPath = "mintedFailed_" + datetime.now() + ".priv"
@@ -58,9 +58,9 @@ def main():
 			privateKey = row[0]
 			amount = row[1]
 			if (isfloat(amount)):
-				fullPost = "http://" + restAPIUrl + "/?" + "from=" + privateKey + "&" + "to=" + publicKey + "&" + "amount=" + amount
+				fullPost = "http://" + restAPIUrl + "/?" + "from=" + privateKey.strip() + "&" + "to=" + publicKey.strip() + "&" + "amount=" + amount.strip()
 
-				print("Executing transaction of " + amount + " vfc from private Key: " + privateKey + " to public Key: " + publicKey + "with: " + fullPost)
+				print("Executing transaction of " + amount.strip() + " vfc from private Key: " + privateKey.strip() + " to public Key: " + publicKey.strip() + "with: " + fullPost)
 				response = requests.post(fullPost)
 				# if response != 201:
 					# print("FAILED, printing failed transactions to " + failedPath
@@ -70,7 +70,9 @@ def main():
 			else:
 				print("Transaction \"" + restAPIUrl + "/?" + "from=" + privateKey + "&" + "to=" + publicKey + "&" + "amount=" + amount + "\" has a weird format" )
 
-	backFilePath = "minted-archived_" + str(datetime.date.today()) + ".priv"
+	backFilePath = "minted-archived_" + str(datetime.datetime.now()) + ".priv"
+
+	print("Copying transaction log to: " + backFilePath)
 	os.rename(fileName, backFilePath)
 	mintedFile = open(fileName, 'w')
 	mintedFile.close()
