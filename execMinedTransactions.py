@@ -46,7 +46,7 @@ def main():
 	print("Executing transactions to Public Key: " + publicKey)
 
 	fileName = "minted.txt"
-	restAPIUrl = "somesite.com"
+	restAPIUrl = "https://vfcash.uk/rest.php?"
 
 	# failedPath = "mintedFailed_" + datetime.now() + ".priv"
 	# failedFile = open(failedPath, 'w')
@@ -58,7 +58,7 @@ def main():
 			privateKey = row[0]
 			amount = row[1]
 			if (isfloat(amount)):
-				fullPost = "http://" + restAPIUrl + "/?" + "from=" + privateKey.strip() + "&" + "to=" + publicKey.strip() + "&" + "amount=" + amount.strip()
+				fullPost = restAPIUrl + "frompriv=" + privateKey.strip() + "&" + "topub=" + publicKey.strip() + "&" + "amount=" + amount.strip()
 
 				print("Executing transaction of " + amount.strip() + " vfc from private Key: " + privateKey.strip() + " to public Key: " + publicKey.strip() + "with: " + fullPost)
 				response = requests.post(fullPost)
