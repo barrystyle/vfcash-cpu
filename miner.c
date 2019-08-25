@@ -126,8 +126,8 @@ int main()
 {
     printf("Please wait, minted keys are saved to minted.txt, difficulty 0.24 ...\n");
     
-    //#pragma omp parallel
-    #pragma omp target teams distribute parallel for
+    #pragma omp parallel
+    //#pragma omp target teams distribute parallel for
     for(int i=0; i < 2048; ++i) 
     {
         i=0;
