@@ -1,9 +1,9 @@
 ## Standalone Miner Compile
 ```
 git clone https://github.com/vfcash/Standalone-Miner.git && cd Standalone-Miner
-gcc -O3 -fopenmp miner.c ecc.c base58.c -lm -o miner.exe
+gcc -Ofast -fopenmp miner.c ecc.c base58.c -lm -o miner.exe
 or with offloading
-gcc -O3 -fopenmp -lomptarget miner.c ecc.c base58.c -lm -o miner.exe
+gcc -Ofast -fopenmp -lomptarget miner.c ecc.c base58.c -lm -o miner.exe
 ```
 
 ## MinGW on Windows (gcc)
