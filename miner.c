@@ -128,9 +128,10 @@ int main()
     
     #pragma omp parallel
     //#pragma omp target teams distribute parallel for
-    for(int i=0; i < 2048; ++i) 
+    //for(int i=0; i < 2048; ++i) 
+    while(1)
     {
-        i=0;
+        //i=0;
         int tid = omp_get_thread_num();
         int nthreads;
         if(tid == 0)
