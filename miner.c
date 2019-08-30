@@ -122,6 +122,52 @@ uint64_t isSubGenesisAddress(uint8_t *a)
 
 }
 
+double subDiff(uint8_t *a)
+{
+    vec3 v[5]; //Vectors
+
+    uint8_t *ofs = a;
+    memcpy(&v[0].x, ofs, sizeof(uint16_t));
+    memcpy(&v[0].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
+    memcpy(&v[0].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+
+    ofs = ofs + (sizeof(uint16_t)*3);
+    memcpy(&v[1].x, ofs, sizeof(uint16_t));
+    memcpy(&v[1].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
+    memcpy(&v[1].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+
+    ofs = ofs + (sizeof(uint16_t)*3);
+    memcpy(&v[2].x, ofs, sizeof(uint16_t));
+    memcpy(&v[2].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
+    memcpy(&v[2].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+
+    ofs = ofs + (sizeof(uint16_t)*3);
+    memcpy(&v[3].x, ofs, sizeof(uint16_t));
+    memcpy(&v[3].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
+    memcpy(&v[3].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+
+    ofs = ofs + (sizeof(uint16_t)*3);
+    memcpy(&v[4].x, ofs, sizeof(uint16_t));
+    memcpy(&v[4].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
+    memcpy(&v[4].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+
+    const double a1 = gNa(&v[0], &v[3]);
+    const double a2 = gNa(&v[3], &v[2]);
+    const double a3 = gNa(&v[2], &v[1]);
+    const double a4 = gNa(&v[1], &v[4]);
+
+    //printf("%.3f - %.3f - %.3f - %.3f\n", a1,a2,a3,a4);
+    double diff = a1;
+    if(a2 > diff)
+        diff = a2;
+    if(a3 > diff)
+        diff = a3;
+    if(a4 > diff)
+        diff = a4;
+    return diff;
+}
+
+
 int main()
 {
     printf("Please wait, minted keys are saved to minted.txt, difficulty 0.24 ...\n");
@@ -167,8 +213,9 @@ int main()
                 size_t len = 256;
                 b58enc(bpriv, &len, priv, ECC_BYTES);
 
+                const double diff = subDiff(pub);
                 const double fr = toDB(r);
-                printf("Private Key: %s (%.3f)\n\n", bpriv, fr);
+                printf("Private Key: %s (%.3f) (%.3f VFC)\n\n", bpriv, diff, fr);
                 
                 FILE* f = fopen("minted.txt", "a");
                 if(f != NULL)
