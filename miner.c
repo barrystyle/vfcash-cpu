@@ -215,7 +215,7 @@ int main()
 
                 const double diff = subDiff(pub);
                 const double fr = toDB(r);
-                printf("Private Key: %s (%.3f) (%.3f VFC)\n\n", bpriv, diff, fr);
+                printf("Private Key: %s (%.3f DIFF) (%.3f VFC)\n\n", bpriv, diff, fr);
                 
                 FILE* f = fopen("minted.txt", "a");
                 if(f != NULL)
