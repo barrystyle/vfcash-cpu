@@ -220,7 +220,7 @@ int main()
                 FILE* f = fopen("minted.txt", "a");
                 if(f != NULL)
                 {
-                    fprintf(f, "%s / %.3f\n", bpriv, fr);
+                    fprintf(f, "%s / %.3f / %.3f\n", bpriv, diff, fr);
                     fclose(f);
                 }
             }
