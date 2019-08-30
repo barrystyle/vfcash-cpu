@@ -109,7 +109,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
         const double mn = 4.166666667;
         const uint64_t rv = (uint64_t)mfloor(( 1000 + ( 10000*(1-(ra*mn)) ) )+0.5);
         
-        printf("subG: %.8f - %.8f - %.8f - %.8f - %.3f VFC < %.3f\n\n", a1, a2, a3, a4, toDB(rv), ra);
+        printf("\nsubG: %.8f - %.8f - %.8f - %.8f - %.3f VFC < %.3f\n", a1, a2, a3, a4, toDB(rv), ra);
         
         return rv;
     }
