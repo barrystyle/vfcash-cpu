@@ -1,5 +1,6 @@
 ## Builds in Directory
 **Windows:** miner-win-64.exe
+
 **Linux:**   miner-linux-64
 
 ## Standalone Miner Compile
