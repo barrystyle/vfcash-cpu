@@ -1,3 +1,7 @@
+## Builds in Directory
+**Windows:** miner-win-64.exe
+**Linux:**   miner-linux-64
+
 ## Standalone Miner Compile
 ```
 git clone https://github.com/vfcash/Standalone-Miner.git && cd Standalone-Miner
