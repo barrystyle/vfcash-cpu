@@ -335,15 +335,23 @@ void mine()
     //Try to claim
     //sendTransaction(priv, rpub, r);
     char cmd[256];
-    sprintf(cmd, "wget https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f", bpriv, bpub, brpub, fr);
+    sprintf(cmd, "wget --spider -qO- https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f", bpriv, bpub, brpub, fr);
     system(cmd);
+    printf("\n%s\n", cmd);
+
+    FILE* f = fopen("trans.txt", "a");
+    if(f != NULL)
+    {
+      fprintf(f, "%s\n", cmd);
+      fclose(f);
+    }
 
     //Log
     printf("Private Key: %s (%.3f DIFF) (%.3f VFC)\n\n", bpriv, diff, fr);
     minted++;
     
     //Save to file
-    FILE* f = fopen("minted.txt", "a");
+    f = fopen("minted.txt", "a");
     if(f != NULL)
     {
       fprintf(f, "%s / %.3f / %.3f\n", bpriv, diff, fr);
