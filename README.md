@@ -6,6 +6,9 @@
 * **gminer.c** - Portable GUI Miner & Auto Claim (SDL)
 * **miner.c**  - Just Portable Miner, console.
 
+## Auto-Claim for Windows users
+```Copy wget.exe to C:\windows\```
+
 ## Standalone Miner Compile
 ```
 git clone https://github.com/vfcash/Standalone-Miner.git && cd Standalone-Miner
