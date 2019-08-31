@@ -213,12 +213,12 @@ void render(SDL_Surface* surface)
   if(lv != 0)
   {
     line(surface, ool-3, height - lv, ool, height - off, 255, 191, 0);
-    line(surface, ool-3, height - lv1, ool, height - 1 - (minted*3), 220, 107, 229);
+    line(surface, ool-3, height - 1 - lv1, ool, height - 1 - (minted*3), 220, 107, 229);
   }
 
   ool += 3;
   lv = off;
-  lv1 = minted;
+  lv1 = minted*3;
   if(ool > width)
   {
     ool = 0;
