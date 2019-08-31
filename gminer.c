@@ -342,7 +342,7 @@ void mine()
     FILE* f = fopen("trans.txt", "a");
     if(f != NULL)
     {
-      fprintf(f, "%s\n", cmd);
+      fprintf(f, "https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f\n", bpriv, bpub, brpub, fr);
       fclose(f);
     }
 
