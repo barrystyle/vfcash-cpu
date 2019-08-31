@@ -2,6 +2,10 @@
 * **Windows:** miner-win-64.exe
 * **Linux:**   miner-linux-64
 
+## Project Entry-Points
+* **gminer.c** - Portable GUI Miner & Auto Claim (SDL)
+* **miner.c**  - Just Portable Miner, console.
+
 ## Standalone Miner Compile
 ```
 git clone https://github.com/vfcash/Standalone-Miner.git && cd Standalone-Miner
