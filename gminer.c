@@ -335,7 +335,7 @@ void mine()
     //Try to claim
     //sendTransaction(priv, rpub, r);
     char cmd[256];
-    sprintf(cmd, "wget --spider -qO- https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f", bpriv, bpub, brpub, fr);
+    sprintf(cmd, "wget -qO- https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f", bpriv, bpub, brpub, fr);
     system(cmd);
     printf("\n%s\n", cmd);
 
