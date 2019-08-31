@@ -213,7 +213,7 @@ void render(SDL_Surface* surface)
   if(lv != 0)
   {
     line(surface, ool-3, height - lv, ool, height - off, 255, 191, 0);
-    line(surface, ool-3, height - lv1, ool, height - 1 - minted, 220, 107, 229);
+    line(surface, ool-3, height - lv1, ool, height - 1 - (minted*3), 220, 107, 229);
   }
 
   ool += 3;
@@ -423,16 +423,16 @@ int main(int argc, char* args[])
       //Update every 3 seconds
       if(tid == 0 && time(0) > nt)
       {
-        char title[256];
-        sprintf(title, "H/s: %lu / C: %d", (c*nthreads), nthreads);
-        SDL_SetWindowTitle(window, title);
-
         render(screenSurface);
         SDL_UpdateWindowSurface(window);
 
+        char title[256];
+        sprintf(title, "H/s: %lu / C: %d", (c*nthreads)/3, nthreads);
+        SDL_SetWindowTitle(window, title);
+
         c = 0;
         minted = 0;
-        nt = time(0);
+        nt = time(0)+2;
       }
 
       //Mine for a key
