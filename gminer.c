@@ -400,7 +400,7 @@ int main(int argc, char* args[])
       //Update every x seconds
       if(tid == 0 && time(0) > nt)
       {
-        const uint hs = c;
+        const uint hs = (c*nthreads)/3;
         render(screenSurface, hs);
         SDL_UpdateWindowSurface(window);
 
@@ -410,7 +410,7 @@ int main(int argc, char* args[])
 
         c = 0;
         minted = 0;
-        nt = time(0)+1;
+        nt = time(0)+3;
       }
 
       //Mine for a key
