@@ -1,6 +1,6 @@
 #include <omp.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
+// #include <SDL2/SDL_net.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
@@ -203,103 +203,103 @@ void render(SDL_Surface* surface, const uint ihs)
   }
 }
 
-uint64_t rand64()
-{
-  return rand() ^ ((uint64_t)rand() << 15) ^ ((uint64_t)rand() << 30) ^ ((uint64_t)rand() << 45) ^ ((uint64_t)rand() << 60);
-}
+// uint64_t rand64()
+// {
+//   return rand() ^ ((uint64_t)rand() << 15) ^ ((uint64_t)rand() << 30) ^ ((uint64_t)rand() << 45) ^ ((uint64_t)rand() << 60);
+// }
 
-struct addr
-{
-    uint8_t key[ECC_CURVE+1];
-};
-typedef struct addr addr;
+// struct addr
+// {
+//     uint8_t key[ECC_CURVE+1];
+// };
+// typedef struct addr addr;
 
-struct sig
-{
-    uint8_t key[ECC_CURVE*2];
-};
-typedef struct sig sig;
+// struct sig
+// {
+//     uint8_t key[ECC_CURVE*2];
+// };
+// typedef struct sig sig;
 
-struct trans
-{
-    uint64_t uid;
-    addr from;
-    addr to;
-    uint32_t amount;
-    sig owner;
-};
+// struct trans
+// {
+//     uint64_t uid;
+//     addr from;
+//     addr to;
+//     uint32_t amount;
+//     sig owner;
+// };
 
-void sendTransaction(const uint8_t* from_priv, const uint8_t* to_pub, const uint32_t amount)
-{
-  //Open Socket
-  UDPsocket sd;
-  if(!(sd = SDLNet_UDP_Open(0)))
-  {
-      printf("Could not create socket\n");
-      return;
-  }
+// void sendTransaction(const uint8_t* from_priv, const uint8_t* to_pub, const uint32_t amount)
+// {
+//   //Open Socket
+//   UDPsocket sd;
+//   if(!(sd = SDLNet_UDP_Open(0)))
+//   {
+//       printf("Could not create socket\n");
+//       return;
+//   }
   
-  //Resolve vfcash.uk
-  IPaddress srvHost;
-  IPaddress *ip = &srvHost;
-  SDLNet_ResolveHost(ip, "vfcash.uk", 8787);
+//   //Resolve vfcash.uk
+//   IPaddress srvHost;
+//   IPaddress *ip = &srvHost;
+//   SDLNet_ResolveHost(ip, "vfcash.uk", 8787);
 
-  //Generate Packet
-  const size_t packet_len = 1+sizeof(uint32_t)+sizeof(uint64_t)+ECC_CURVE+1+ECC_CURVE+1+sizeof(uint32_t)+ECC_CURVE+ECC_CURVE;
-  UDPpacket *p = SDLNet_AllocPacket(packet_len);
-  if(!p)
-  {
-      printf("Could not allocate packet\n");
-      return;
-  }
+//   //Generate Packet
+//   const size_t packet_len = 1+sizeof(uint32_t)+sizeof(uint64_t)+ECC_CURVE+1+ECC_CURVE+1+sizeof(uint32_t)+ECC_CURVE+ECC_CURVE;
+//   UDPpacket *p = SDLNet_AllocPacket(packet_len);
+//   if(!p)
+//   {
+//       printf("Could not allocate packet\n");
+//       return;
+//   }
 
-  //Gen Public Key
-  uint8_t from_pub[ECC_BYTES+1];
-  ecc_get_pubkey(from_pub, from_priv);
+//   //Gen Public Key
+//   uint8_t from_pub[ECC_BYTES+1];
+//   ecc_get_pubkey(from_pub, from_priv);
 
-  //Transaction
-  struct trans t;
-  memset(&t, 0, sizeof(struct trans));
-  //
-  memcpy(t.from.key, from_pub, ECC_CURVE+1);
-  memcpy(t.to.key, to_pub, ECC_CURVE+1);
-  t.amount = amount;
+//   //Transaction
+//   struct trans t;
+//   memset(&t, 0, sizeof(struct trans));
+//   //
+//   memcpy(t.from.key, from_pub, ECC_CURVE+1);
+//   memcpy(t.to.key, to_pub, ECC_CURVE+1);
+//   t.amount = amount;
 
-  //Sign the block
-  uint8_t thash[ECC_CURVE];
-  sha3_context c;
-  sha3_Init256(&c);
-  sha3_Update(&c, &t, sizeof(struct trans));
-  sha3_Finalize(&c);
-  memcpy(thash, &c.sb, ECC_CURVE);
-  if(ecdsa_sign(from_priv, thash, t.owner.key) == 0)
-  {
-      printf("\nSorry you're client failed to sign the Transaction.\n\n");
-      exit(0);
-  }
+//   //Sign the block
+//   uint8_t thash[ECC_CURVE];
+//   sha3_context c;
+//   sha3_Init256(&c);
+//   sha3_Update(&c, &t, sizeof(struct trans));
+//   sha3_Finalize(&c);
+//   memcpy(thash, &c.sb, ECC_CURVE);
+//   if(ecdsa_sign(from_priv, thash, t.owner.key) == 0)
+//   {
+//       printf("\nSorry you're client failed to sign the Transaction.\n\n");
+//       exit(0);
+//   }
 
-  const uint origin = 0;
-  const uint64_t uid = rand64();
-  uint8_t *pc = p->data;
-  pc[0] = 't';
-  uint8_t* ofs = pc + 1;
-  memcpy(ofs, &origin, sizeof(uint32_t));
-  ofs += sizeof(uint32_t);
-  memcpy(ofs, &t.uid, sizeof(uint64_t));
-  ofs += sizeof(uint64_t);
-  memcpy(ofs, t.from.key, ECC_CURVE+1);
-  ofs += ECC_CURVE+1;
-  memcpy(ofs, t.to.key, ECC_CURVE+1);
-  ofs += ECC_CURVE+1;
-  memcpy(ofs, &t.amount, sizeof(uint32_t));
-  ofs += sizeof(uint32_t);
-  memcpy(ofs, t.owner.key, ECC_CURVE*2);
+//   const uint origin = 0;
+//   const uint64_t uid = rand64();
+//   uint8_t *pc = p->data;
+//   pc[0] = 't';
+//   uint8_t* ofs = pc + 1;
+//   memcpy(ofs, &origin, sizeof(uint32_t));
+//   ofs += sizeof(uint32_t);
+//   memcpy(ofs, &t.uid, sizeof(uint64_t));
+//   ofs += sizeof(uint64_t);
+//   memcpy(ofs, t.from.key, ECC_CURVE+1);
+//   ofs += ECC_CURVE+1;
+//   memcpy(ofs, t.to.key, ECC_CURVE+1);
+//   ofs += ECC_CURVE+1;
+//   memcpy(ofs, &t.amount, sizeof(uint32_t));
+//   ofs += sizeof(uint32_t);
+//   memcpy(ofs, t.owner.key, ECC_CURVE*2);
 
-  //Send Packet
-  p->address.host = srvHost.host;
-  p->address.port = srvHost.port;
-  SDLNet_UDP_Send(sd, -1, p);
-}
+//   //Send Packet
+//   p->address.host = srvHost.host;
+//   p->address.port = srvHost.port;
+//   SDLNet_UDP_Send(sd, -1, p);
+// }
 
 void mine()
 {
@@ -314,11 +314,29 @@ void mine()
     size_t len = 256;
     b58enc(bpriv, &len, priv, ECC_BYTES);
 
+    char bpub[256];
+    memset(bpub, 0, sizeof(bpub));
+    len = 256;
+    b58enc(bpub, &len, pub, ECC_BYTES+1);
+
+    char brpriv[256];
+    memset(brpriv, 0, sizeof(brpriv));
+    len = 256;
+    b58enc(brpriv, &len, rpriv, ECC_BYTES);
+
+    char brpub[256];
+    memset(brpub, 0, sizeof(brpub));
+    len = 256;
+    b58enc(brpub, &len, rpub, ECC_BYTES+1);
+
     const double diff = subDiff(pub);
     const double fr = toDB(r);
 
     //Try to claim
-    sendTransaction(priv, rpub, r);
+    //sendTransaction(priv, rpub, r);
+    char cmd[256];
+    sprintf(cmd, "wget https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f", bpriv, bpub, brpub, fr);
+    system(cmd);
 
     //Log
     printf("Private Key: %s (%.3f DIFF) (%.3f VFC)\n\n", bpriv, diff, fr);
@@ -421,7 +439,7 @@ int main(int argc, char* args[])
 
   //Done.
   SDL_DestroyWindow(window);
-  SDLNet_Quit();
+  //SDLNet_Quit();
   SDL_Quit();
   return 0;
 }
