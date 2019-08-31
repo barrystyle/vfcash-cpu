@@ -1,6 +1,7 @@
 ## Builds in Directory
-* **Windows:** miner-win-64.exe
-* **Linux:**   miner-linux-64
+* **Windows:**    miner-win-64.exe
+* **Linux:**      miner-linux-64
+* **Linux GUI:**  clang-gminer-linux-64
 
 ## Project Entry-Points
 * **gminer.c** - Portable GUI Miner & Auto Claim (SDL)
