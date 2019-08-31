@@ -11,6 +11,9 @@
 #include "ecc.h"
 #include "base58.h"
 
+uint8_t rpriv[ECC_BYTES];
+uint8_t rpub[ECC_BYTES+1];
+
 float approx_sqrt(float n)
 {
     long i;
@@ -171,6 +174,19 @@ double subDiff(uint8_t *a)
 int main()
 {
     printf("Please wait, minted keys are saved to minted.txt, difficulty 0.24 ...\n");
+
+    //Save reward addr used today
+    ecc_make_key(rpub, rpriv);
+    FILE* f = fopen("reward.txt", "a");
+    if(f != NULL)
+    {
+        char bpriv[256];
+        memset(bpriv, 0, sizeof(bpriv));
+        size_t len = sizeof(bpriv);
+        b58enc(bpriv, &len, rpriv, ECC_CURVE);
+        fprintf(f, "%s\n", bpriv);
+        fclose(f);
+    }
     
     #pragma omp parallel
     //#pragma omp target teams distribute parallel for
@@ -213,11 +229,33 @@ int main()
                 size_t len = 256;
                 b58enc(bpriv, &len, priv, ECC_BYTES);
 
+                char bpub[256];
+                memset(bpub, 0, sizeof(bpub));
+                len = 256;
+                b58enc(bpub, &len, pub, ECC_BYTES+1);
+
+                char brpriv[256];
+                memset(brpriv, 0, sizeof(brpriv));
+                len = 256;
+                b58enc(brpriv, &len, rpriv, ECC_BYTES);
+
+                char brpub[256];
+                memset(brpub, 0, sizeof(brpub));
+                len = 256;
+                b58enc(brpub, &len, rpub, ECC_BYTES+1);
+
                 const double diff = subDiff(pub);
                 const double fr = toDB(r);
                 printf("Private Key: %s (%.3f DIFF) (%.3f VFC)\n\n", bpriv, diff, fr);
+
+                FILE* f = fopen("trans.txt", "a");
+                if(f != NULL)
+                {
+                    fprintf(f, "https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f\n", bpriv, bpub, brpub, fr);
+                    fclose(f);
+                }
                 
-                FILE* f = fopen("minted.txt", "a");
+                f = fopen("minted.txt", "a");
                 if(f != NULL)
                 {
                     fprintf(f, "%s / %.3f / %.3f\n", bpriv, diff, fr);
