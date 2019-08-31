@@ -246,8 +246,17 @@ int main()
 
                 const double diff = subDiff(pub);
                 const double fr = toDB(r);
+
+                //Log in console
                 printf("Private Key: %s (%.3f DIFF) (%.3f VFC)\n\n", bpriv, diff, fr);
 
+                //Try to claim
+                char cmd[2048];
+                sprintf(cmd, "wget -qO- https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f", bpriv, bpub, brpub, fr);
+                if(system(cmd) != -1)
+                    printf("\n%s\n", cmd);
+
+                //Log claim url
                 FILE* f = fopen("trans.txt", "a");
                 if(f != NULL)
                 {
@@ -255,6 +264,7 @@ int main()
                     fclose(f);
                 }
                 
+                //Log in minted
                 f = fopen("minted.txt", "a");
                 if(f != NULL)
                 {
