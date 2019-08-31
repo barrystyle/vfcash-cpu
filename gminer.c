@@ -185,7 +185,7 @@ int lv = 0;
 int lv1 = 0;
 void render(SDL_Surface* surface, const uint ihs)
 {
-  const uint hs = ihs/1000;
+  const uint hs = ihs/700;
   
   if(lv != 0)
   {
@@ -400,7 +400,7 @@ int main(int argc, char* args[])
       //Update every x seconds
       if(tid == 0 && time(0) > nt)
       {
-        const uint hs = (c*nthreads);
+        const uint hs = c;
         render(screenSurface, hs);
         SDL_UpdateWindowSurface(window);
 
