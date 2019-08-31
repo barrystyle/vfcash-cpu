@@ -154,29 +154,6 @@ double subDiff(uint8_t *a)
     return diff;
 }
 
-long double getCPULoad()
-{
-    long double a[4], b[4];
-    char dump[50];
-    
-    FILE *fp = fopen("/proc/stat","r");
-    if(fp)
-    {
-        fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&a[0],&a[1],&a[2],&a[3]);
-        fclose(fp);
-    }
-    
-    SDL_Delay(1000);
-
-    fp = fopen("/proc/stat","r");
-    if(fp)
-    {
-        fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&b[0],&b[1],&b[2],&b[3]);
-        fclose(fp);
-    }
-
-    return ((b[0]+b[1]+b[2]) - (a[0]+a[1]+a[2])) / ((b[0]+b[1]+b[2]+b[3]) - (a[0]+a[1]+a[2]+a[3]));
-}
 
 void setpixel(SDL_Surface * surface, const int x, const int y, const Uint8 r, const Uint8 g, const Uint8 b)
 {
@@ -206,18 +183,18 @@ void line(SDL_Surface * surface, int x0, int y0, int x1, int y1, const Uint8 r, 
 int ool = 0;
 int lv = 0;
 int lv1 = 0;
-void render(SDL_Surface* surface)
+void render(SDL_Surface* surface, const uint ihs)
 {
-  const int off = (float)(getCPULoad()*height);
+  const uint hs = ihs/1000;
   
   if(lv != 0)
   {
-    line(surface, ool-3, height - lv, ool, height - off, 255, 191, 0);
+    line(surface, ool-3, lv, ool, hs, 255, 191, 0);
     line(surface, ool-3, height - 1 - lv1, ool, height - 1 - (minted*3), 220, 107, 229);
   }
 
   ool += 3;
-  lv = off;
+  lv = hs;
   lv1 = minted*3;
   if(ool > width)
   {
@@ -401,7 +378,7 @@ int main(int argc, char* args[])
     }
     
     time_t nt = time(0);
-    uint64_t c = 0;
+    uint32_t c = 0;
     while(1)
     {
       if(tid == 0) //UI Thread
@@ -420,19 +397,20 @@ int main(int argc, char* args[])
         }
       }
 
-      //Update every 3 seconds
+      //Update every x seconds
       if(tid == 0 && time(0) > nt)
       {
-        render(screenSurface);
+        const uint hs = (c*nthreads);
+        render(screenSurface, hs);
         SDL_UpdateWindowSurface(window);
 
         char title[256];
-        sprintf(title, "H/s: %lu / C: %d", (c*nthreads)/3, nthreads);
+        sprintf(title, "H/s: %u / C: %d", hs, nthreads);
         SDL_SetWindowTitle(window, title);
 
         c = 0;
         minted = 0;
-        nt = time(0)+2;
+        nt = time(0)+1;
       }
 
       //Mine for a key
