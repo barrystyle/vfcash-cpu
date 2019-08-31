@@ -1,10 +1,14 @@
 ## Builds in Directory
-* **Windows:** miner-win-64.exe
-* **Linux:**   miner-linux-64
+* **Windows:**    miner-win-64.exe
+* **Linux:**      clang-miner-linux-64
+* **Linux GUI:**  clang-gui-miner-linux-64
 
 ## Project Entry-Points
 * **gminer.c** - Portable GUI Miner & Auto Claim (SDL)
 * **miner.c**  - Just Portable Miner, console.
+
+## Auto-Claim for Windows users
+```Copy wget.exe to C:\windows\```
 
 ## Standalone Miner Compile
 ```
