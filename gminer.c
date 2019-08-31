@@ -303,9 +303,9 @@ void sendTransaction(const uint8_t* from_priv, const uint8_t* to_pub, const uint
 
   const uint origin = 0;
   const uint64_t uid = rand64();
-  char *pc = p->data;
+  uint8_t *pc = p->data;
   pc[0] = 't';
-  char* ofs = pc + 1;
+  uint8_t* ofs = pc + 1;
   memcpy(ofs, &origin, sizeof(uint32_t));
   ofs += sizeof(uint32_t);
   memcpy(ofs, &t.uid, sizeof(uint64_t));
