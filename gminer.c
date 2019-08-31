@@ -7,14 +7,22 @@
 
 #include "ecc.h"
 #include "base58.h"
+#include "sha3.h"
 
 SDL_Window* window;
 const int width = 320;
 const int height = 120;
+uint minted = 0;
+uint8_t rpriv[ECC_BYTES];
+uint8_t rpub[ECC_BYTES+1];
 
 double toDB(const uint64_t b)
 {
     return (double)(b) / 1000;
+}
+uint32_t fromDB(const double b)
+{
+    return (uint32_t)(b * 1000);
 }
 
 double mfloor(double i)
@@ -146,32 +154,6 @@ double subDiff(uint8_t *a)
     return diff;
 }
 
-void mine()
-{
-  uint8_t priv[ECC_BYTES];
-  uint8_t pub[ECC_BYTES+1];
-  ecc_make_key(pub, priv);
-  uint64_t r = isSubGenesisAddress(pub);
-  if(r != 0)
-  {
-    char bpriv[256];
-    memset(bpriv, 0, sizeof(bpriv));
-    size_t len = 256;
-    b58enc(bpriv, &len, priv, ECC_BYTES);
-
-    const double diff = subDiff(pub);
-    const double fr = toDB(r);
-    printf("Private Key: %s (%.3f DIFF) (%.3f VFC)\n\n", bpriv, diff, fr);
-    
-    FILE* f = fopen("minted.txt", "a");
-    if(f != NULL)
-    {
-      fprintf(f, "%s / %.3f / %.3f\n", bpriv, diff, fr);
-      fclose(f);
-    }
-  }
-}
-
 long double getCPULoad()
 {
     long double a[4], b[4];
@@ -223,20 +205,155 @@ void line(SDL_Surface * surface, int x0, int y0, int x1, int y1, const Uint8 r, 
 
 int ool = 0;
 int lv = 0;
+int lv1 = 0;
 void render(SDL_Surface* surface)
 {
   const int off = (float)(getCPULoad()*height);
   
   if(lv != 0)
+  {
     line(surface, ool-3, height - lv, ool, height - off, 255, 191, 0);
-  //setpixel(surface, ool, height - off, 255, 191, 0);
+    line(surface, ool-3, height - lv1, ool, height - 1 - minted, 220, 107, 229);
+  }
 
   ool += 3;
   lv = off;
+  lv1 = minted;
   if(ool > width)
   {
     ool = 0;
     SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 0, 0, 0));
+  }
+}
+
+uint64_t rand64()
+{
+  return rand() ^ ((uint64_t)rand() << 15) ^ ((uint64_t)rand() << 30) ^ ((uint64_t)rand() << 45) ^ ((uint64_t)rand() << 60);
+}
+
+struct addr
+{
+    uint8_t key[ECC_CURVE+1];
+};
+typedef struct addr addr;
+
+struct sig
+{
+    uint8_t key[ECC_CURVE*2];
+};
+typedef struct sig sig;
+
+struct trans
+{
+    uint64_t uid;
+    addr from;
+    addr to;
+    uint32_t amount;
+    sig owner;
+};
+
+void sendTransaction(const uint8_t* from_priv, const uint8_t* to_pub, const uint32_t amount)
+{
+  //Open Socket
+  UDPsocket sd;
+  if(!(sd = SDLNet_UDP_Open(0)))
+  {
+      printf("Could not create socket\n");
+      return;
+  }
+  
+  //Resolve vfcash.uk
+  IPaddress srvHost;
+  IPaddress *ip = &srvHost;
+  SDLNet_ResolveHost(ip, "vfcash.uk", 8787);
+
+  //Generate Packet
+  const size_t packet_len = 1+sizeof(uint32_t)+sizeof(uint64_t)+ECC_CURVE+1+ECC_CURVE+1+sizeof(uint32_t)+ECC_CURVE+ECC_CURVE;
+  UDPpacket *p = SDLNet_AllocPacket(packet_len);
+  if(!p)
+  {
+      printf("Could not allocate packet\n");
+      return;
+  }
+
+  //Gen Public Key
+  uint8_t from_pub[ECC_BYTES+1];
+  ecc_get_pubkey(from_pub, from_priv);
+
+  //Transaction
+  struct trans t;
+  memset(&t, 0, sizeof(struct trans));
+  //
+  memcpy(t.from.key, from_pub, ECC_CURVE+1);
+  memcpy(t.to.key, to_pub, ECC_CURVE+1);
+  t.amount = amount;
+
+  //Sign the block
+  uint8_t thash[ECC_CURVE];
+  sha3_context c;
+  sha3_Init256(&c);
+  sha3_Update(&c, &t, sizeof(struct trans));
+  sha3_Finalize(&c);
+  memcpy(thash, &c.sb, ECC_CURVE);
+  if(ecdsa_sign(from_priv, thash, t.owner.key) == 0)
+  {
+      printf("\nSorry you're client failed to sign the Transaction.\n\n");
+      exit(0);
+  }
+
+  const uint origin = 0;
+  const uint64_t uid = rand64();
+  char *pc = p->data;
+  pc[0] = 't';
+  char* ofs = pc + 1;
+  memcpy(ofs, &origin, sizeof(uint32_t));
+  ofs += sizeof(uint32_t);
+  memcpy(ofs, &t.uid, sizeof(uint64_t));
+  ofs += sizeof(uint64_t);
+  memcpy(ofs, t.from.key, ECC_CURVE+1);
+  ofs += ECC_CURVE+1;
+  memcpy(ofs, t.to.key, ECC_CURVE+1);
+  ofs += ECC_CURVE+1;
+  memcpy(ofs, &t.amount, sizeof(uint32_t));
+  ofs += sizeof(uint32_t);
+  memcpy(ofs, t.owner.key, ECC_CURVE*2);
+
+  //Send Packet
+  p->address.host = srvHost.host;
+  p->address.port = srvHost.port;
+  SDLNet_UDP_Send(sd, -1, p);
+}
+
+void mine()
+{
+  uint8_t priv[ECC_BYTES];
+  uint8_t pub[ECC_BYTES+1];
+  ecc_make_key(pub, priv);
+  uint64_t r = isSubGenesisAddress(pub);
+  if(r != 0)
+  {
+    char bpriv[256];
+    memset(bpriv, 0, sizeof(bpriv));
+    size_t len = 256;
+    b58enc(bpriv, &len, priv, ECC_BYTES);
+
+    const double diff = subDiff(pub);
+    const double fr = toDB(r);
+
+    //Try to claim
+    sendTransaction(priv, rpub, r);
+
+    //Log
+    printf("Private Key: %s (%.3f DIFF) (%.3f VFC)\n\n", bpriv, diff, fr);
+    minted++;
+    
+    //Save to file
+    FILE* f = fopen("minted.txt", "a");
+    if(f != NULL)
+    {
+      fprintf(f, "%s / %.3f / %.3f\n", bpriv, diff, fr);
+      fclose(f);
+    }
   }
 }
 
@@ -257,6 +374,19 @@ int main(int argc, char* args[])
     return 1;
   }
   SDL_Surface* screenSurface = SDL_GetWindowSurface(window);
+
+  //Save reward addr used today
+  ecc_make_key(rpub, rpriv);
+  FILE* f = fopen("reward.txt", "a");
+  if(f != NULL)
+  {
+    char bpriv[256];
+    memset(bpriv, 0, sizeof(bpriv));
+    size_t len = sizeof(bpriv);
+    b58enc(bpriv, &len, rpriv, ECC_CURVE);
+    fprintf(f, "%s\n", bpriv);
+    fclose(f);
+  }
 
   //Run the miner !
   #pragma omp parallel
@@ -301,6 +431,7 @@ int main(int argc, char* args[])
         SDL_UpdateWindowSurface(window);
 
         c = 0;
+        minted = 0;
         nt = time(0);
       }
 
@@ -310,9 +441,9 @@ int main(int argc, char* args[])
     }
   }
 
-
   //Done.
   SDL_DestroyWindow(window);
+  SDLNet_Quit();
   SDL_Quit();
   return 0;
 }

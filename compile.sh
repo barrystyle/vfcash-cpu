@@ -8,7 +8,7 @@ apt install --assume-yes gcc
 gcc -Ofast -fopenmp miner.c ecc.c base58.c -lm -o miner-linux-64
 i686-w64-mingw32-gcc -Ofast -fopenmp miner.c ecc.c base58.c -lm -o miner-win-64.exe
 
-gcc -Ofast -fopenmp gminer.c ecc.c base58.c -lSDL2 -lm -o gui-miner-linux-64
-i686-w64-mingw32-gcc -Ofast -fopenmp gminer.c ecc.c base58.c -lSDL2 -lm -o gui-miner-win-64.exe
+gcc -Ofast -fopenmp gminer.c sha3.c ecc.c base58.c -lSDL2 -lSDL2_net -lm -o gui-miner-linux-64
+i686-w64-mingw32-gcc -Ofast -fopenmp gminer.c sha3.c ecc.c base58.c -lSDL2 -lSDL2_net -lm -o gui-miner-win-64.exe
 
 
