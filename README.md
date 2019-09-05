@@ -8,7 +8,7 @@
 * **miner.c**  - Just Portable Miner, console.
 
 ## Auto-Claim for Windows users
-```Copy wget.exe to C:\windows\ or C:\windows\system32```
+* **Install WGET** from http://downloads.sourceforge.net/gnuwin32/wget-1.11.4-1-setup.exe
 * **rewards.txt** - A new rewards address is generated and appened to rewards.txt each time you start the miner, all claimed addresses during this session will be sent to the newly generated rewards address.
 * **trans.txt**   - All API url calls that where executed are appended to this file, easy method of re-execution.
 * **minted.txt**  - All minted private keys are appened to this file.
