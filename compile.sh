@@ -2,6 +2,7 @@ apt install --assume-yes libsdl2-net-2.0-0
 apt install --assume-yes libsdl2-net-dev
 apt install --assume-yes libsdl2-2.0-0
 apt install --assume-yes libsdl2-dev
+apt install --assume-yes libomp-dev
 apt install --assume-yes mingw-w64
 apt install --assume-yes gcc
 apt install --assume-yes clang
