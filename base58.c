@@ -25,8 +25,8 @@ static const int8_t b58digits_map[] = {
 int b58tobin(void *bin, size_t *binszp, const char *b58, size_t b58sz)
 {
 	size_t binsz = *binszp;
-	const unsigned char *b58u = (void*)b58;
-	unsigned char *binu = bin;
+	const unsigned char *b58u = (unsigned char*)b58;
+	unsigned char *binu = (unsigned char*)bin;
 	size_t outisz = (binsz + 3) / 4;
 	uint32_t outi[outisz];
 	uint64_t t;
@@ -90,7 +90,7 @@ int b58tobin(void *bin, size_t *binszp, const char *b58, size_t b58sz)
 	}
 	
 	// Count canonical base58 byte count
-	binu = bin;
+	binu = (unsigned char*)bin;
 	for (i = 0; i < binsz; ++i)
 	{
 		if (binu[i])
@@ -106,7 +106,7 @@ static const char b58digits_ordered[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdef
 
 int b58enc(char *b58, size_t *b58sz, const void *data, size_t binsz)
 {
-	const uint8_t *bin = data;
+	const uint8_t *bin = (const uint8_t*)data;
 	int carry;
 	ssize_t i, j, high, zcount = 0;
 	size_t size;

@@ -1,15 +1,14 @@
 //VF CASH - Standalone Miner - August 2019
 //James William Fletcher
 
-#include <omp.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include "base58.h"
 
 #include "ecc.h"
-#include "base58.h"
 
 uint8_t rpriv[ECC_BYTES];
 uint8_t rpub[ECC_BYTES+1];

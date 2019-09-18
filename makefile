@@ -1,7 +1,7 @@
-all: miner.exe
+all: miner
 
-miner.exe: miner.c ecc.c base58.c
-	 gcc -fopenmp miner.c ecc.c base58.c -lm -o miner.exe
+miner: miner.c ecc.c base58.c
+	 gcc -march=native -O3 -fopenmp miner.c ecc.c base58.c -lm -o miner
      
 clean:
-	 rm miner.exe
+	 rm miner

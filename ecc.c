@@ -4,7 +4,6 @@
 */
 #include "ecc.h"
 
-#include <string.h>
 
 #define NUM_ECC_DIGITS (ECC_BYTES/8)
 #define MAX_TRIES 16
