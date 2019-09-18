@@ -1,6 +1,7 @@
 //VF CASH - Standalone Miner - August 2019
 //James William Fletcher
 
+#include <omp.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
@@ -12,21 +13,6 @@
 
 uint8_t rpriv[ECC_BYTES];
 uint8_t rpub[ECC_BYTES+1];
-
-float approx_sqrt(float n)
-{
-    long i;
-    float x2, y;
-    const float threehalfs = 1.5F;
-    x2 = n * 0.5F;
-    y  = n;
-    i  = * ( long * ) &y;
-    i  = 0x5f3759df - ( i >> 1 );
-    y  = * ( float * ) &i;
-    y  = y * ( threehalfs - ( x2 * y * y ) );
-    y  = y * ( threehalfs - ( x2 * y * y ) );
-    return n*y;
-}
 
 double toDB(const uint64_t b)
 {
@@ -57,13 +43,6 @@ double gNa(const vec3* a, const vec3* b)
         return 1;
 
     return dot / (m1*m2);
-}
-
-double getMiningDifficulty()
-{
-    const time_t lt = time(0);
-    const struct tm* tmi = gmtime(&lt);
-    return (double)(tmi->tm_hour+1) * 0.01;
 }
 
 uint64_t isSubGenesisAddress(uint8_t *a)
@@ -102,8 +81,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
 
     const double min = 0.24;
     
-    if(a1 < min && a2 < min && a3 < min && a4 < min)
-    {
+    if(a1 < min) { if(a2 < min) { if(a3 < min) { if(a4 < min) {
         const double at = (a1+a2+a3+a4);
         if(at <= 0)
             return 0;
@@ -114,7 +92,7 @@ uint64_t isSubGenesisAddress(uint8_t *a)
         printf("\nsubG: %.8f - %.8f - %.8f - %.8f - %.3f VFC < %.3f\n", a1, a2, a3, a4, toDB(rv), ra);
         
         return rv;
-    }
+    }}}}
     
     const double soft = 0.1;
     if(a1 < min+soft && a2 < min+soft && a3 < min+soft && a4 < min+soft)
