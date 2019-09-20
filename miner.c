@@ -1,6 +1,11 @@
 //VF CASH - Standalone Miner - August 2019
 //James William Fletcher
 
+// Config; Un-/comment to dis-/enable
+#define HASHRATE_MONITOR // Removing the hashrate monitor deletes
+                         // most of the logging but increases 
+                         // performance by quite a bit.
+
 #include <omp.h>
 #include <stdio.h>
 #include <math.h>
@@ -19,11 +24,7 @@
 uint8_t rpriv[ECC_BYTES];
 uint8_t rpub[ECC_BYTES+1];
 
-double toDB(const uint64_t b)
-{ // Do something about this.
-    return (double)(b) / 1000;
-}
-
+#define toDB(x) ((double)(x)/1000)
 #define mfloor(x) floor(x) //It's already implemented in math
 
 struct vec3
@@ -184,8 +185,13 @@ int main()
         
         time_t nt = time(0)+16;
         uint64_t c = 0;
+        // As reallocating memory is slow, we allocate it once
+        // and simply overwrite it
+        uint8_t priv[ECC_BYTES];
+        uint8_t pub[ECC_BYTES+1];
         while(1)
         {
+            #ifdef HASHRATE_MONITOR
             if(time(0) > nt)
             {
                 if(tid == 0)
@@ -197,32 +203,26 @@ int main()
                 c = 0;
                 nt = time(0)+16;
             }
+            #endif
 
-            uint8_t priv[ECC_BYTES];
-            uint8_t pub[ECC_BYTES+1];
+
             ecc_make_key(pub, priv);
             uint64_t r = isSubGenesisAddress(pub);
-            if(r != 0)
+            if(r)
             {
                 char bpriv[256];
-                memset(bpriv, 0, sizeof(bpriv));
-                size_t len = 256;
-                b58enc(bpriv, &len, priv, ECC_BYTES);
-
                 char bpub[256];
-                memset(bpub, 0, sizeof(bpub));
-                len = 256;
-                b58enc(bpub, &len, pub, ECC_BYTES+1);
-
                 char brpriv[256];
-                memset(brpriv, 0, sizeof(brpriv));
-                len = 256;
-                b58enc(brpriv, &len, rpriv, ECC_BYTES);
-
                 char brpub[256];
-                memset(brpub, 0, sizeof(brpub));
-                len = 256;
-                b58enc(brpub, &len, rpub, ECC_BYTES+1);
+                size_t len[4] = [256,256,256,256];
+                memset(bpriv, 0, 256);
+                memset(bpub, 0, 256);
+                memset(brpriv, 0, 256);
+                memset(brpub, 0, 256);
+                b58enc(bpriv, len, priv, ECC_BYTES);
+                b58enc(bpub, &len[1], pub, ECC_BYTES+1);
+                b58enc(brpriv, &len[2], rpriv, ECC_BYTES);
+                b58enc(brpub, &len[3], rpub, ECC_BYTES+1);
 
                 const double diff = subDiff(pub);
                 const double fr = toDB(r);
@@ -238,16 +238,16 @@ int main()
 
                 //Log claim url
                 FILE* f = fopen("trans.txt", "a");
-                if(f != NULL)
-                {
+                if(!f) printf("WARNING: Could not append to trans.txt\n");
+                else{
                     fprintf(f, "https://vfcash.uk/rest.php?fromprivfast=%s&frompub=%s&topub=%s&amount=%.3f\n", bpriv, bpub, brpub, fr);
                     fclose(f);
                 }
                 
                 //Log in minted
                 f = fopen("minted.txt", "a");
-                if(f != NULL)
-                {
+                if(!f) printf("WARNING: Could not append to minted.txt\n");
+                else{
                     fprintf(f, "%s / %.3f / %.3f\n", bpriv, diff, fr);
                     fclose(f);
                 }
