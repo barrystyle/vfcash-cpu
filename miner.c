@@ -11,6 +11,11 @@
 
 #include "ecc.h"
 
+#include <stddef.h>
+#include <stdint.h>
+#include <emmintrin.h>
+
+
 uint8_t rpriv[ECC_BYTES];
 uint8_t rpub[ECC_BYTES+1];
 
@@ -45,34 +50,38 @@ double gNa(const vec3* a, const vec3* b)
     return dot / (m1*m2);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+static inline void fastcpy(void *dst, const void *src) { memmove(dst,src,2); }
+//////////////////////////////////////////////////////////////////////////////
+
 uint64_t isSubGenesisAddress(uint8_t *a)
 {
     vec3 v[5];
 
     uint8_t *ofs = a;
-    memcpy(&v[0].x, ofs, sizeof(uint16_t));
-    memcpy(&v[0].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[0].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[0].x, ofs);
+    fastcpy(&v[0].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[0].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[1].x, ofs, sizeof(uint16_t));
-    memcpy(&v[1].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[1].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[1].x, ofs);
+    fastcpy(&v[1].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[1].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[2].x, ofs, sizeof(uint16_t));
-    memcpy(&v[2].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[2].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[2].x, ofs);
+    fastcpy(&v[2].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[2].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[3].x, ofs, sizeof(uint16_t));
-    memcpy(&v[3].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[3].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[3].x, ofs);
+    fastcpy(&v[3].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[3].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[4].x, ofs, sizeof(uint16_t));
-    memcpy(&v[4].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[4].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[4].x, ofs);
+    fastcpy(&v[4].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[4].z, ofs + (sizeof(uint16_t)*2));
 
     const double a1 = gNa(&v[0], &v[3]);
     const double a2 = gNa(&v[3], &v[2]);
@@ -99,7 +108,6 @@ uint64_t isSubGenesisAddress(uint8_t *a)
         printf("x: %.8f - %.8f - %.8f - %.8f\n", a1, a2, a3, a4);
 
     return 0;
-
 }
 
 double subDiff(uint8_t *a)
@@ -107,36 +115,36 @@ double subDiff(uint8_t *a)
     vec3 v[5]; //Vectors
 
     uint8_t *ofs = a;
-    memcpy(&v[0].x, ofs, sizeof(uint16_t));
-    memcpy(&v[0].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[0].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[0].x, ofs);
+    fastcpy(&v[0].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[0].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[1].x, ofs, sizeof(uint16_t));
-    memcpy(&v[1].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[1].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[1].x, ofs);
+    fastcpy(&v[1].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[1].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[2].x, ofs, sizeof(uint16_t));
-    memcpy(&v[2].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[2].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[2].x, ofs);
+    fastcpy(&v[2].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[2].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[3].x, ofs, sizeof(uint16_t));
-    memcpy(&v[3].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[3].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[3].x, ofs);
+    fastcpy(&v[3].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[3].z, ofs + (sizeof(uint16_t)*2));
 
     ofs = ofs + (sizeof(uint16_t)*3);
-    memcpy(&v[4].x, ofs, sizeof(uint16_t));
-    memcpy(&v[4].y, ofs + sizeof(uint16_t), sizeof(uint16_t));
-    memcpy(&v[4].z, ofs + (sizeof(uint16_t)*2), sizeof(uint16_t));
+    fastcpy(&v[4].x, ofs);
+    fastcpy(&v[4].y, ofs + sizeof(uint16_t));
+    fastcpy(&v[4].z, ofs + (sizeof(uint16_t)*2));
 
     const double a1 = gNa(&v[0], &v[3]);
     const double a2 = gNa(&v[3], &v[2]);
     const double a3 = gNa(&v[2], &v[1]);
     const double a4 = gNa(&v[1], &v[4]);
 
-    //printf("%.3f - %.3f - %.3f - %.3f\n", a1,a2,a3,a4);
+    // printf("%.3f - %.3f - %.3f - %.3f\n", a1,a2,a3,a4);
     double diff = a1;
     if(a2 > diff)
         diff = a2;
@@ -166,8 +174,6 @@ int main()
     }
     
     #pragma omp parallel
-    //#pragma omp target teams distribute parallel for
-    //for(int i=0; i < 2048; ++i) 
     while(1)
     {
         //i=0;

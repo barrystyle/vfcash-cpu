@@ -1,9 +1,5 @@
-/*
-    Copyright (c) 2013, Kenneth MacKay
-    All rights reserved.
-*/
 #include "ecc.h"
-
+#include <cstddef>
 #define NUM_ECC_DIGITS (ECC_BYTES/8)
 #define MAX_TRIES 16
 
@@ -70,69 +66,9 @@ static uint64_t curve_b[NUM_ECC_DIGITS] = CONCAT(Curve_B_, ECC_CURVE);
 static EccPoint curve_G = CONCAT(Curve_G_, ECC_CURVE);
 static uint64_t curve_n[NUM_ECC_DIGITS] = CONCAT(Curve_N_, ECC_CURVE);
 
-#if (defined(_WIN32) || defined(_WIN64))
-/* Windows */
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <wincrypt.h>
-
-static int getRandomNumber(uint64_t *p_vli)
-{
-    HCRYPTPROV l_prov;
-    if(!CryptAcquireContext(&l_prov, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
-    {
-        return 0;
-    }
-
-    CryptGenRandom(l_prov, ECC_BYTES, (BYTE *)p_vli);
-    CryptReleaseContext(l_prov, 0);
-    
-    return 1;
-}
-
-#else /* _WIN32 */
-
-/* Assume that we are using a POSIX-like system with /dev/urandom or /dev/random. */
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-#ifndef O_CLOEXEC
-    #define O_CLOEXEC 0
-#endif
-
-static int getRandomNumber(uint64_t *p_vli)
-{
-    int l_fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
-    if(l_fd == -1)
-    {
-        l_fd = open("/dev/random", O_RDONLY | O_CLOEXEC);
-        if(l_fd == -1)
-        {
-            return 0;
-        }
-    }
-    
-    char *l_ptr = (char *)p_vli;
-    size_t l_left = ECC_BYTES;
-    while(l_left > 0)
-    {
-        int l_read = read(l_fd, l_ptr, l_left);
-        if(l_read <= 0)
-        { // read failed
-            close(l_fd);
-            return 0;
-        }
-        l_left -= l_read;
-        l_ptr += l_read;
-    }
-    
-    close(l_fd);
-    return 1;
-}
-
-#endif /* _WIN32 */
 
 static void vli_clear(uint64_t *p_vli)
 {
@@ -658,19 +594,6 @@ static void vli_modInv(uint64_t *p_result, uint64_t *p_input, uint64_t *p_mod)
     vli_set(p_result, u);
 }
 
-/* ------ Point operations ------ */
-
-/* Returns 1 if p_point is the point at infinity, 0 otherwise. */
-static int EccPoint_isZero(EccPoint *p_point)
-{
-    return (vli_isZero(p_point->x) && vli_isZero(p_point->y));
-}
-
-/* Point multiplication algorithm using Montgomery's ladder with co-Z coordinates.
-From http://eprint.iacr.org/2011/338.pdf
-*/
-
-/* Double in place */
 static void EccPoint_double_jacobian(uint64_t *X1, uint64_t *Y1, uint64_t *Z1)
 {
     /* t1 = X, t2 = Y, t3 = Z */
@@ -876,33 +799,50 @@ static void ecc_native2bytes(uint8_t p_bytes[ECC_BYTES], const uint64_t p_native
 
 int ecc_make_key(uint8_t p_publicKey[ECC_BYTES+1], uint8_t p_privateKey[ECC_BYTES])
 {
+    //////////////////////////////////////////////////////
     uint64_t l_private[NUM_ECC_DIGITS];
     EccPoint l_public;
-    unsigned l_tries = 0;
-    
-    do
-    {
-        if(!getRandomNumber(l_private) || (l_tries++ >= MAX_TRIES))
-        {
-            return 0;
+	int l_fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+	//////////////////////////////////////////////////////
+	char *l_ptr = (char *)l_private;
+	size_t l_left = ECC_BYTES;
+	while(l_left > 0) {
+		int l_read = read(l_fd, l_ptr, l_left);
+		l_left -= l_read;
+		l_ptr += l_read;
+	}
+	//////////////////////////////////////////////////////
+	bool result = true;
+	for(int i = 0; i < NUM_ECC_DIGITS; ++i) {
+		if(l_private[i]) {
+                   result = false;
+                   break;
+                }
         }
-        if(vli_isZero(l_private))
-        {
-            continue;
-        }
-    
-        /* Make sure the private key is in the range [1, n-1].
-           For the supported curves, n is always large enough that we only need to subtract once at most. */
-        if(vli_cmp(curve_n, l_private) != 1)
-        {
-            vli_sub(l_private, l_private, curve_n);
-        }
-
-        EccPoint_mult(&l_public, &curve_G, l_private, NULL);
-    } while(EccPoint_isZero(&l_public));
-    
-    ecc_native2bytes(p_privateKey, l_private);
-    ecc_native2bytes(p_publicKey + 1, l_public.x);
-    p_publicKey[0] = 2 + (l_public.y[0] & 0x01);
-    return 1;
+	if (result) return 0;
+	//////////////////////////////////////////////////////
+	int r = 2;
+	for(int i = NUM_ECC_DIGITS-1; i >= 0; --i) {
+	  if(curve_n[i]>l_private[i]) r=1;
+	  if(curve_n[i]<l_private[i]) r=-1;
+	}
+	if (r>1) r=0;
+	//////////////////////////////////////////////////////
+	if (r!=1) {
+	   uint64_t l_borrow = 0;
+	   for(uint i=0; i<NUM_ECC_DIGITS; ++i) {
+	      uint64_t l_diff = l_private[i] - curve_n[i] - l_borrow;
+	      if(l_diff != l_private[i]) l_borrow = (l_diff > l_private[i]);
+ 	      l_private[i] = l_diff;
+	   }
+	}
+	//////////////////////////////////////////////////////
+	EccPoint_mult(&l_public, &curve_G, l_private, NULL);
+	close(l_fd);
+        ecc_native2bytes(p_privateKey, l_private);
+        ecc_native2bytes(p_publicKey + 1, l_public.x);
+        p_publicKey[0] = 2 + (l_public.y[0] & 0x01);
+        return 1;
+	//////////////////////////////////////////////////////
 }
+
